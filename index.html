@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pothole Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 15px 20px;
+            text-align: center;
+        }
+
+        main {
+            max-width: 600px;
+            margin: 30px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        video {
+            display: block;
+            margin: 20px auto;
+            width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 14px;
+            color: #888;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 20px;
+            background-color: #f3f3f3;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #007bff;
+            width: 0%;
+            border-radius: 5px;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 14px;
+            color: #333;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Pothole Detection</h1>
+    </header>
+    
+    <main>
+        <h1>Upload Video for Pothole Detection</h1>
+
+        <form id="videoForm" enctype="multipart/form-data">
+            <label for="videoUpload">Choose a Video File:</label>
+            <input type="file" id="videoUpload" name="video" accept="video/*" required>
+            <button type="submit">Upload and Detect Potholes</button>
+        </form>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-text" id="progressText">Processing...</div>
+
+        <h2>Processed Video:</h2>
+        <video id="processedVideo" controls></video>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 YOLOv8 Pothole Detection.</p>
+    </footer>
+
+    <script>
+        const form = document.getElementById("videoForm");
+        const progressContainer = document.getElementById("progressContainer");
+        const progressBar = document.getElementById("progressBar");
+        const progressText = document.getElementById("progressText");
+    
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            
+            const formData = new FormData();
+            formData.append("file", document.getElementById("videoUpload").files[0]);
+
+            // Show progress bar
+            progressContainer.style.display = "block";
+            progressBar.style.width = "0%";
+            progressText.textContent = "Detecting potholes, please wait...";
+
+            try {
+                const response = await fetch("http://127.0.0.1:5000/upload_video", {
+                    method: "POST",
+                    body: formData,
+                    headers: {
+                        // Optional headers for your Flask backend
+                    },
+                    // Track progress during the upload
+                    onUploadProgress: (progressEvent) => {
+                        if (progressEvent.lengthComputable) {
+                            const percent = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+                            progressBar.style.width = percent + "%";
+                            progressText.textContent = percent + "% - Uploading...";
+                        }
+                    }
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    const videoUrl = result.download_url; // Use the correct key returned by the backend
+                    document.getElementById("processedVideo").src = videoUrl;
+                    document.getElementById("processedVideo").style.display = "block"; // Ensure the video is visible
+                    
+                    // Once processed, update the progress bar to 100%
+                    progressBar.style.width = "100%";
+                    progressText.textContent = "100% - Complete!";
+                } else {
+                    alert("Error uploading video: " + result.error);
+                }
+            } catch (error) {
+                alert("Error: " + error.message);
+            }
+        });
+    </script>
+    
+</body>
+</html>
