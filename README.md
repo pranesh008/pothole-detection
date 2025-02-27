@@ -115,6 +115,6 @@ This project is open-source and available under the MIT License.
 
 ---
 
-**Author:** Your Name\
-**GitHub:** [YourUsername](https://github.com/yourusername/)
+**Author:** Pranesh Puri
+**GitHub:** pranesh_008 (https://github.com/pranesh_008/)
 
