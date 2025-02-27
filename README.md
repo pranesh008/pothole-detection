@@ -116,5 +116,5 @@ This project is open-source and available under the MIT License.
 ---
 
 **Author:** Pranesh Puri
-**GitHub:** pranesh_008 (https://github.com/pranesh_008/)
+**GitHub:** pranesh008 (https://github.com/pranesh008/)
 
